@@ -47,5 +47,5 @@ Protocols are needed to **manage the flow control of data and access control** o
 - Trivial File Transfer Protocol (TFTP)&nbsp;&nbsp;&nbsp;&nbsp;[(To Wiki)](https://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol)
   
 [**To index**](../ComputerNetwork.md)  
-[**To previous page**](URL.md)  
-[**To next page**](TCP_IP.md)  
+[**To previous page**](NetworkModels.md)  
+[**To next page**](HTTP_Request.md)  

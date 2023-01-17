@@ -10,4 +10,4 @@ An Internationalized Resource Identifier (IRI) is a form of URL that includes Un
   
 [**To index**](../ComputerNetwork.md)  
 [**To previous page**](URI.md)  
-[**To next page**](InternetProtocols.md)  
+[**To next page**](NetworkModels.md)

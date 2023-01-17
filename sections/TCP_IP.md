@@ -1,14 +1,15 @@
-# **TCP/IP**
+# **TCP/IP (Transmission Control Protocol/Internet Protocol)**
   
-> ***A set of standard rules that allows different types of computers to communicate with each other.*** **IP** ensures that each computer connected to Internet has unique serial number called IP address. **TCP** specifies how data is exchanged over the Internet and how it should be broken into IP packets. It also makes sure that the packets have information about the source, the destination, and the sequence in which the message data should be re-assembled. It also checks if the message has been sent corretly to the specified destination. TCP is also known as a connection-oriented protocol.
+> ***A set of standard rules that allows different types of computers to communicate with each other.*** **IP** ensures that each computer connected to Internet has unique serial number called IP address. **TCP** specifies how data is exchanged over the Internet and how it should be broken into **IP** packets. It also makes sure that the packets have information about the source, the destination, and the sequence in which the message data should be re-assembled. It also checks if the message has been sent corretly to the specified destination. TCP is also known as a connection-oriented protocol.
   
-It is network model developed prior to [OSI model](). It consists of 4 layers:  
+It is network model developed prior to [OSI model](OSI.md). It consists of 4 layers:  
 1. Layer 4: Application Layer  
 2. Layer 3: Transport Layer  
 3. Layer 2: Internet Layer  
 4. Layer 1: Network Access Layer (Data Link & Physical Layer)
 
 Some authors compare TCP/IP with OSI model's 7 layers. Whilst doing that, they separated TCP/IP model's layer 1 into two different layers; data link layer and physical layer. Thus, in some reference, it is said that TCP/IP consists of 5 layers.  
+> Layer 4 in TCP/IP Model is equivalent to *Application Layer, Presentation Layer, and Session Layer of OSI model* **combined**. Layer 1 in TCP/IP Model is equivalent to *Data Link and Physical Layer of OSI model* **combined**.
   
 ---  
 ## *Application Layer: Layer 4*
@@ -78,5 +79,5 @@ These are all protocols used in LAN.
   
 ---
 [**To index**](../ComputerNetwork.md)  
-[**To previous page**](InternetProtocols.md)  
-[**To next page**](HTTP_Request.md)  
+[**To previous page**](NetworkModels.md)  
+[**To next page**](OSI.md)  
