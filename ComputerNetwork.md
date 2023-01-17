@@ -8,9 +8,11 @@
 ---
 > # [**Uniform Resource Locator (URL) (A.K.A web address)**](sections/URL.md)
 ---
+> # [**Network Models**](sections/NetworkModels.md)
+---
 > # [**Internet Protocols**](sections/InternetProtocols.md)
 ---
-> # [**TCP/IP**](sections/TCP_IP.md)
+> # [**Network Models**](sections/NetworkModels.md)
 ---
 > # [**HTTP Request Methods**](sections/HTTP_Request.md)
 ---
