@@ -30,7 +30,7 @@ Below are examples.
 |Old C| Ends in .h | math.h | Can be used in both C and C++. |
 |Old C++| Ends in .h | iostream.h | Can be used in C++. |
 |**New C++**| No extension | iostream | Can be used in C++ and uses *std * namespace. |
-|**Derived from C**| Has prefix *c*. No extension. | cmath (derived from math.h) | Can be used in C++ and uses *std * namespace. |
+|**Derived from C**| Has prefix *c*. No extension. | cmath (derived from math.h) | Can be used in C++. |
 
 # **Namespace**
 It is similar to namespace in Python. (Perhaps it is exactly same.)
@@ -234,11 +234,11 @@ cin >> name;
 // Get single line input.
 int arrSize = 100;
 char name2[arrSize] {};       // This was not possible in C, but in C++ it is.
-cin.getline(name2, arrSize);  // getline reads unil \n (including \n) but does not store \n in the array.
+cin.getline(name2, arrSize);  // getline reads until \n (including \n) but does not store \n in the array.
                               // Replaces \n with \0 when storing the data.
 
 char name3[100] {};
-cin.get(name3, arrSize);      // get with same parameter as getlines reads until \n/ (not including \n).
+cin.get(name3, arrSize);      // get with same parameter as getlines reads until \n. (not including \n).
                               // That is, \n is stil left in the buffer.
 cin.get();                    // Reads single character no matter what. In this case it reads and removes \n from input buffer.
 
@@ -326,3 +326,115 @@ delete [] arrPtr;  // YOU MUST INCLUDE []!!!
 1. **Vector template class**: You can declare vector of specific type by ***vector&lt;typeName&gt; vectorName(numElem);***. Of course you need to include &lt;vector&gt; header file. Vector is allocated in heap. 
 2. **array template class**: You can declare array of specific type by ***array&lt;typeName, numElem&gt; arrName;***. Of course you need to include &lt;array&gt;  header file. Unlike other things, *numElem* cannot be a variable for array. Array class is allocated in stack.
   
+---  
+# **For Loop**
+> **It is mostly same as *C*. It is entry condition loop.** Only difference is that initializing in *initialization* part of *for loop* is now legal.
+There is new type of *for loop* called ***Range-based for loop*** (since C++11).
+``` cpp
+double prices[5] = {4.99, 10.99, 6.87, 7.99, 8.49};
+for (double price: prices)
+    cout << x << endl;
+for (double &price: prices)
+    price *= 0.8;  // apply 20% sales.
+```
+---  
+# **While Loop**  
+> **It is same as *C*. It is entry condition loop.**
+---  
+# **Do-while Loop**
+> **It is same as *C*. It is exit condition loop.**
+---  
+# **Sequence Point**  
+> First, we need to know what *side effect* is. When an c++ expression is being evaluated, effects other than evaluation can occur, such as values of variables can change. These effects that are not evaluation of an expression is called **side effects** of the expression. ***Sequence point*** is a part of a code where all the side effects are completely evaluated. Usually *semicolon* indicate sequence point. In addition to semicolons, *comma operator* also indicates sequence point.  
+  
+**Between consecutive "sequence points" an object's value can be modified only once by an expression. The C language defines the following sequence points:**
+* Left operand of the logical-AND operator (&&). The left operand of the logical-AND operator is completely evaluated and all side effects complete before continuing. If the left operand evaluates to false (0), the other operand is not evaluated.
+* Left operand of the logical-OR operator (||). The left operand of the logical-OR operator is completely evaluated and all side effects complete before continuing. If the left operand evaluates to true (nonzero), the other operand is not evaluated.
+* Left operand of the comma operator. The left operand of the comma operator is completely evaluated and all side effects complete before continuing. Both operands of the comma operator are always evaluated. Note that the comma operator in a function call does not guarantee an order of evaluation.
+* Function-call operator. All arguments to a function are evaluated and all side effects complete before entry to the function. No order of evaluation among the arguments is specified.
+* First operand of the conditional operator. The first operand of the conditional operator is completely evaluated and all side effects complete before continuing.
+* The end of a full initialization expression (that is, an expression that is not part of another expression such as the end of an initialization in a declaration statement).
+* The expression in an expression statement. Expression statements consist of an optional expression followed by a semicolon (;). The expression is evaluated for its side effects and there is a sequence point following this evaluation.
+* The controlling expression in a selection (if or switch) statement. The expression is completely evaluated and all side effects complete before the code dependent on the selection is executed.
+* The controlling expression of a while or do statement. The expression is completely evaluated and all side effects complete before any statements in the next iteration of the while or do loop are executed.
+* Each of the three expressions of a for statement. The expressions are completely evaluated and all side effects complete before any statements in the next iteration of the for loop are executed.
+* The expression in a return statement. The expression is completely evaluated and all side effects complete before control returns to the calling function.
+  
+---  
+# **cin.get(ch) and cin.get()**
+| Characteristic | **cin.get(ch)** | **ch = cin.get()** |
+| :---: | :---: | :---: |
+| How is input delivered. | Saved in argument ch. | Return value of function is saved to variable. | 
+| Return value of function when there is input. | istream instance.<br>(instance has value of *true* when typecasted.) | ASCII code that is *int* type. | 
+| Return value when EOF is met. | istream instance.<br>(instance has value of *false* when typecasted.) | EOF |  
+  
+> There is things to remember when using cin. If there is bad-input (ex. EOF), **cin will be interpreted as *false***. In this case, you need to use cin.clear() to reset flags.  
+> * [Related StackOverflow Page](https://stackoverflow.com/questions/5131647/why-would-we-call-cin-clear-and-cin-ignore-after-reading-input)
+> * [Documentation](https://en.cppreference.com/w/cpp/io/basic_ios/clear)  
+---  
+# **Boolean Operators**
+> && and || are sequence points. (Fun fact! People sometimes call '!' as *bang*. lol) && have higher piority than ||.  
+
+In c++ boolean operators have their substitutes.  
+
+| Operator | Substitute |
+| :---: | :---: | 
+| && | and |
+| <p>\|\|</p> | or |
+| ! | not |  
+  
+---  
+# **cctype**  
+| function | return |
+| :---: | :---: |
+| isalnum | If argument is alphabet or number, returns true. Else false. |
+| isalpha | If argument is alphabet, returns true. Else false. | 
+| isblank | If argument is space or tab, returns true. Else false. |
+| iscntrl | If argument is control character, returns true. Else false. |
+| isdigit | If argument is base-10 number, returns true. Else false. | 
+| isgraph | If argument is not space that is print-able, returns true. Else false. |
+| islower | If argument is lowercase, returns true. Else false. |
+| isprint | If argument is print-able (including space), returns true. Else false. |
+| ispunct | If argument is punctuation, returns true. Else false. |
+| isspace | If argument is standard white-space, returns true. Else false. | 
+| isupper | If argument is uppercase, returns true. Else false. |
+| isxdigit | If argument is hexadecimal, returns true. Else false. |
+| tolower | Changes all characters to lower case then returns the result. |
+| toupper | Changes all characters to upper case then returns the result. |
+
+---  
+# **File I/O**
+```cpp
+#include <fstream>
+#include <iostream>
+#include <string>
+
+int main() {
+    std::ifstream fin;
+    std::ofstream fout;
+    std::string filename;
+    std::string result;
+    std::cout << "File name? ";
+    std::cin >> filename;
+
+    // Open output file.
+    fout.open(filename);
+    if (!fout.is_open()) {  // Check for error.
+        exit(EXIT_FAILURE);
+    }
+
+    fout << "File IO, output test.\n";
+    fout.close();
+
+    // Open input file.
+    fin.open(filename);
+    if (!fin.is_open()) {  // Check for error.
+        exit(EXIT_FAILURE);
+    }
+    std::getline(fin, result);
+    std::cout << "result is: " << result << '\n';
+    fin.close();
+
+    return 0;
+}
+```
