@@ -273,7 +273,7 @@ getline(cin, lineinput);        // Getting single line input is little different
 ```
 ---  
 ## *2. Structure, Union, and Enum (Basically same as C)*
-> Basically it is same as C, except that you can use c++ style initialization. There is slight difference to C. In C, keyword *struct* is needed in front of structure tag (or that of union, or that of enum). However in C++, it is not needed, thus usage of typedef is not necessary.
+> Basically it is same as C, except that you can use c++ style initialization. There is slight difference to C. In C, keyword *struct* is needed in front of structure tag (or that of union, or that of enum) when initializing. However in C++, it is not needed, thus usage of typedef is not necessary.
 ``` cpp
 using namespace std;
 struct student {
@@ -371,6 +371,70 @@ int *ar2[4]; // Array with 4 int pointer. Same as '(int *) ar2[4];'
 int (*ar2)[4]; // *ar2 is array of 4 integers. In function prototype, int ar2[][4] is more easy to read.
 ```
 <br><p align="center"><img src="cpp_pic/two_dimensional_array_parameter.jpg" alt="Two Dim Array" style="width:50%;"/></p>
+
+> Function pointers are pointers to functions. It is just function name. (Kind of like python.) That is, for function prototype ***void foo(...)***, its function pointer is ***foo***. When passing function pointer as argument, parameter in function prototype is <b>typeName (*func_name)(signature)(</b>). (In the nutshell, replace function name with (*function_name) in function prototype.)
+
+```cpp
+#include <iostream>
+#include <ctime>
+
+double foo1(int);
+double foo2(int);
+
+// Parameter of function pointer is **typeName (*func_name)(signature)**.
+time_t calc_run_time(int lines, double (*func)(int));
+
+int main() {
+    using namespace std;
+    int test_line = 10;
+
+    // Below two statement do same thing, making function pointer variable.
+    double (*foo_ptr)(int) = foo1;
+    auto foo_ptr2 = foo2;
+
+    // Array of functions. Put [<number>] next to function pointer.
+    // Below code means, 1. foo__arr[2] => It is array with 2 elements.
+    //                   2. *foo_arr[2] => Because of *, it is array of pointers.
+    //                   3. (*foo_arr[2])(int)  => Pointers are function pointer where functions have parameter of (int).
+    //                   4. double (*foo_arr[2])(int)  => Those function pointers have return type of double.
+    // You cannot use auto for initializing array.
+    double (*foo_arr[2])(int) = {foo1, foo2};
+    // But using auto like below is possible.
+    auto foo_arr2 = foo_arr;
+
+    // You can call functions with function pointers like following.
+    (*foo_ptr)(test_line);  // This is legit.
+    foo_ptr(test_line);     // This is 'allowed.'
+
+    cout << calc_run_time(test_line, foo1) << endl;
+    cout << calc_run_time(test_line, foo2) << endl;
+
+    return 0;
+}
+
+double foo1(int lines) {
+    return 0.05 * lines;
+}
+
+double foo2(int lines) {
+    return 0.03 * lines + 0.0004 * lines * lines;
+}
+
+time_t calc_run_time(int lines, double (*func)(int)) {
+    using namespace std;
+    time_t start = time(NULL), end;
+    (*func)(lines);
+    end = time(NULL);
+    return end - start;
+}
+```
+
+## SOME WEIRD POINTER SHIT
+
+> const double* (*(*ptr)[3])(const double*, int)
+> 1. ptr is pointer variable name.
+> 2. (*ptr)[3] => *ptr is array of 3 elements. Thus, ptr is pointer of array.
+> 3. Rest is saying that each element is function with prototype 'const double* foo(const double*, int)'
 ---  
 
 
