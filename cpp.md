@@ -87,13 +87,156 @@ int main() {
     cout << a123 << endl;  // Message statement.
 
     // This is reference. It is similar to definition.
+    // Reference should always be initialized while being declared.
     // Now, ref is another name for a
     // and points to same memory address.
     int& ref = a;
+
+    int *ptr = &a;
+    int*& ptr_ref = ptr;
+    //ptr and ptr_ref reference same memory space.
     
     return 0;  // Return statement.
 }
 ```
+## **lvalue Reference**
+> Reference is new composite type added to C++. It makes some operations that were previously implemented by pointer (thus, bit confusing) easier.  
+> It is basically alias to already existing variable. It is mainly used for parameters for functions.  
+> This is similar to const pointer (ex. int * const ptr).  
+> Just like pointer, there is const reference. (ex. const int& ref) => Then, value of ref is not changable.  
+> **REFERENCE is very useful when dealing with large data types such as struct and class.**  
+> It is also called as lvalue reference. (lvalue is sometimes called as location value since it has location in the memory.)
+> Usually, we use reference parameter (1) to allow modifications to arguments of calling function inside called function or (2) to increase speed of program (since it does not copy value of large data class or variable.) However, these can be achieved with pointers. 
+```cpp
+#include <iostream>
+
+void swap(int&, int&);
+
+int main() {
+    int a = 10;
+    int& ref = a; // ref and a are samething.
+
+    // &ref == &a is true.
+
+    // 
+    int b = 5;
+    ref = b;  // This will change value of ref to 5, ref will not reference new variable.
+              // Since ref is alia of a, this is same as 'a = b' thus value of a will also change.
+              // Basically, &ref is still &a.
+    swap(a, b); // Value of a and b are swapped.
+
+    swap(a + 3, b);  // This is illegal.
+                     // However, some compilers will make temporary variable 'ra'.
+                     // Newer, C++ compilers only allow this temporary variable only if
+                     // reference is const.
+    // If temporary variable is created that stores the value (in this case a + 3),
+    // only the value in temporary variable will change. 
+    // That is, value of a will not change. 
+    // Which kind of goes against the reason why reference was made. 
+
+    const int& const_a = a;
+    ++a;             // This will increment value at &a.
+    ++const_a;       // This will cause error.
+    // a and const_a is reference to same memory address, that is, &a == &const_a
+    // But, const_a is unmodifiable whereas a is modifiable.
+
+    return 0;
+}
+
+void swap(int& x, int& y) {
+    int temp = x;
+    x = y;
+    y = temp;
+    // x and y will be switched. 
+    // Since x and y will reference same memory address as a and b in main function,
+    // actual values of a and b will be switched.
+}
+```
+
+```cpp
+/*
+Return of reference.
+*/
+#include <iostream>
+
+int& return_ref(int&);
+const int& ref(const int&);
+
+int main() {
+    using namespace std;
+    int n = 10;
+
+    cout << "address of n: " << &n << endl;
+
+    cout << "address of return_ref(n): " << &return_ref(n) << endl;
+
+    // return_ref(n) on the left is alias to n, since it returns reference of its input.
+    return_ref(n) = 2;
+    // When returning reference, make sure that it does NOT RETURN
+    // reference that dies off after a function ends.
+    // It like returning pointer to a local variable, which will cause segmentation fault.
+    cout << "value of n: " << n << endl;
+
+    // This will create temporary variable that stores 10.
+    // Then returns reference to temporary variable.
+    ref(10);
+    // Temporary variable made by calling ref is no longer accessable, but it remains in the memory.
+    // Since it is not accessable, you can not free its memory.
+    // However, the memory occupied by temporary variables is usually very small 
+    // and is automatically managed by the compiler and the underlying operating system,
+    // so you do not need to worry about freeing it manually. 
+    // The memory will be reused for other purposes as needed.
+    // Read below for more information.
+
+    return 0;
+}
+
+// Returning reference might cause problem.
+// So, return const reference (ex. const int&)
+int& return_ref(int& n) {
+    ++n;
+    return n;
+}
+
+const int& ref(const int& n) {
+    return n;
+}
+```
+### **Temporary Variable**
+They are only created in below two cases.  
+- Argument is right data type but not lvalue. (**lvalue** is data instance that can be referenced. Statement with multiple terms or illegal syntax are not lvalue.)
+- Argument is not correct data but can be type casted into the correct data.  
+
+Because of this, something like 'const int& n = 10' is possible. Compiler creates temporary variable and saves value 10, then n becomes reference to this temporary variable. (10 is integer type, but is not lvalue => same as first case.)  
+
+> From above code block, temporary variable created by **ref** function can not be manually freed because they are managed by the compiler and destroyed automatically when they go out of scop.<br>  
+> In C++, temporary variables are automatically created and managed by the compiler, and are destroyed at the end of the scope in which they were created. This means that once the temporary variable is created in the function, it will exist in memory until the end of the scope, and it cannot be manually freed.<br>  
+> However, the memory occupied by temporary variables is usually very small and is automatically managed by the compiler and the underlying operating system, so you do not need to worry about freeing it manually. The memory will be reused for other purposes as needed.
+
+### **When to use reference and when to use pointers?**
+*Go below (Composite Data Type -> 3. Pointer) to read about pointers.*  
+When function is using varible without modification.
+* If variable is primitive (or built-in) data type or small sized struct, just pass the value (use call by value).
+* To pass in array, use pointer. (It is your only option anyway. Use pointer of const variable since you will only be reading the data. (ex. const int*))
+* If you are to pass large struct, use const pointer or const reference. (That is pointer and reference itself should be const; int* const or const int&)
+* If you are to pass instance of a large class, use const reference.  
+  
+When function is modifying its argument.  
+* If argument is primitive data type, use pointer. (This combined with above, will allow you to easily distinguish function that modifies primitive type variable from the function that only read the primitive type variable.)
+* If argument is array, use pointer. (It is only option.)
+* If argument is struct, use either pointer or reference.
+* If argument is instance of a class, use reference.
+
+| Data category | Function that only reads | Function that modifies |
+| :---: | :---: | :---: |
+| Primitive data type or small struct | Pass in the value | Pass in the pointer |
+| Array | Pointer of const | Pointer | 
+| Large struct | Const Pointer or Const Reference | Pointer or Reference |
+| Instance of class | Const Reference | Reference |  
+
+## **rvalue Reference**
+> There is also rvalue reference (from C++11). Which is **declared with &&**.  
+> It assigns value to its right.  
 
 # **Class, Object, and Instance**
 **Class** is user-defined data type.  
@@ -140,7 +283,8 @@ For **unsigned long long** type constants, you can use ***ull***, ***uLL***, ***
 
 
 # **Membership Operator**
-**<em>[operator].[method_name](arguments)</em>** => **.** is called membership operator. (ex. cout.put('!'); )
+**<em>[operator].[method_name](arguments)</em>** => **.** is called membership operator. (ex. cout.put('!'); )  
+It is also known as the 'dot operator.'
 
 # **wchar_t**
 **w**ide **char**acter **t**ype  
@@ -558,3 +702,75 @@ int main() {
     return 0;
 }
 ```
+---  
+# **Inline Function**
+> Compiled inline code is directly inserted into the program's other code. Basically, compiler replaces function call with actual code of the function.
+
+When inline function is used, program does not have to jump to the function's memory address and return back to original process. Thus, it **takes less time**.  
+However, since code is directly inserted, it is **less efficient in memory**.  
+***Also, it is NOT possible to use recursive function as inline function.***  
+
+```cpp
+#include <iostream>
+
+inline void foo1();
+void foo2();
+inline foo3() { std::cout << "foo3\n"; }
+
+int main() {
+    foo1();  // inline keyword front of function parameter.
+    foo2();  // inline keyword front of function definition.
+    foo3();  // Convention is to put function definition before main function with inline keyword. 
+             // Just like foo3().
+    return 0;
+}
+
+void foo1() {
+    std::cout << "foo1\n";
+}
+
+inline void foo2() {
+    std::cout << "foo2\n";
+}
+```
+
+# **Default Parameter**
+This is newly added in the C++.  
+This is value used as aurgument when it is omitted in the function call.  
+You assign default value in function prototype. (This is similar to default parameter in Python.)  
+However, default parameter should always be **positioned after non-default parameters.**  
+That is, every parameters that comes after default paramter in function prototype should also be default parameters.
+> int correct(int x, int y = 1, int z = 1) is correct.  
+> int incorrect(int x = 1, int y = 1, int z) is incorrect.
+
+```cpp
+#include <iostream>
+
+int add_one(int n = 0);
+
+int main() {
+    using namespace std;
+
+    int n = 10;
+    cout << add_one(10) << endl; // Prints 11 on screen.
+    cout << add_one() << endl;   // Prints 1 on screen.
+
+    return 0;
+}
+
+int add_one(int n) {
+    return n + 1;
+}
+```
+
+# **Function Overloading (Polymorphism of Functions)**
+> Multiple function sharing same name.
+
+**Function signature** is parameter list a function has. If two functions have same number and same type of paramters, they have same signature. Names of parameters do not matter.  
+In C++, defining multiple functions with different signatures is allowed. Functions with same signature but different return types cannot be overloaded. Not all signatures are allowed to coexist even if they seem different.  
+Below two are examples of signatures that cannot coexist.  
+> double cube(double x);  
+> double cube(double& x);  
+> Compiler cannot decided which one to use, thus they cannot coexist.  
+
+# **Function Template** 
