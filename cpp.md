@@ -774,3 +774,265 @@ Below two are examples of signatures that cannot coexist.
 > Compiler cannot decided which one to use, thus they cannot coexist.  
 
 # **Function Template** 
+> It is a generalized function. It **allows you to write a single function that can operate on values of different data types**. Using function template (A.K.A parameterized type), same code can be used with different data types.  
+> It uses **generic type**, hence, this type of programming is called **generic programming**.  
+> Just like functions you can overload them.  
+> When compiler generates function from the template, the result is called **instantiation** of the template.
+
+It is defined using template keyword, followed by a template parameter list, which specify function's signature. The actual type is specified when the function is called.  
+```cpp
+// This is how you make function template.
+template <typename T>
+T max(T a, T b) {
+    return (a > b) ? a : b;
+}
+
+// You may also use 'class' instead of 'typename'
+template <class Any> 
+void swap(Any& a, Any& b) {
+    Any temp;
+    temp = a;
+    a = b;
+    b = temp;
+}
+
+// Prototype of function template.
+template <typename T>
+T min(T a, T b);
+
+int main() {
+    max(2.0, -4.5);
+    min(1, 2);
+    return 0;
+}
+
+// Definition of function template.
+template <typenaem T>
+T min(T a, T b) {
+    return (a > b) ? b : a;
+}
+```
+
+Function templates ****do not create actual functions**, they tell complier how it can define a function.  
+Sometimes excluding certain data types might be necessary. In this case **explicit specialization** can be used. There are few formats for this.  
+```cpp
+// 3rd generation specialization.
+//
+// 1. For one name, one can have functions that are not templates, template functions, and specialized template functions.
+//    They can also have their overloaded versions.
+// 2. For explicit specializtion, one needs 'template <>' in front of prototype and definition of the function.
+// 3. Specialized functions ignore template.
+//    Functions that are not template ignores specialized function and template function.
+
+// Function that is not template.
+void swap(int&, int&);
+
+// Template function.
+template <typename T>
+void swap(T&, T&);
+
+// Overloading of template.
+template <typename T>
+void swap(T& a, T& b, int c);
+
+// Explicit specialization. This is like overloading template function with integer parameter signature.
+// If function's signature for which data type a function is specialized in,
+// then <type> can be neglected.
+// Below are both valid.
+template <> void swap<double>(double&, double&);
+template <> void swap(double&, double&);
+
+// Compiler prefers normal function over the other two.
+// Compiler preferes explicit specialization over template function.
+// Normal function > explicit specialization > template function
+```
+
+> If programmer is using old version of compiler, 3rd generation specialization might not work.  
+> If this is the case, make normal function, since the normal function has higher priority than template.
+> Even this does not work, you are using older version. In this case remove 'template <>' from 3rd generation specialization.
+
+```cpp
+// You can create template with multiple generic form like following.
+template <typename T1, typename T1>
+void hello(T1 a, T2 b);
+
+// You can also overload signature of it.
+template <typename T>
+void hello(T a);
+```
+
+There are two types of instantiation. (The difference is whether or not <> exists after template keyword.)
+* Implicit instantiation
+    - Using function like **swap(x, y)**. Prototype of template that implicitly initialize is **template <> void swap<int>(int&, int&)**.
+* Explicit instantiation
+    - Using function like **swap<int>(x, y)**. Prototype of template that explicitly initialize is **template void swap<int>(int&, int&)**.  
+    - Just add **template** keyword.
+```cpp
+#include <iostream>
+
+template <typename T>
+void Swap(T& a, T& b);
+
+template <>
+void Swap<double>(double&, double&);  // Explicit specialization.
+template void Swap<int>(int&, int&);  // Explicit instantiation. => This tells compiler to make function definition of int type using Swap template.
+
+// For single data type, explicit specialization and explicit instantiation should NOT BE USED TOGETHER.
+
+int main() {
+    short a = 1, b = 2;
+    int x = 1, y = 2;
+    Swap(a, b);       // implicit instantiation.
+    Swap<int>(x, y);  // explicit instantiation.
+    // You don't need <int>
+    return 0;
+}
+
+template <typename T>
+void Swap(T& a, T& b) {
+    T temp = a;
+    a = b;
+    b = temp;
+}
+
+template <>
+void Swap<double>(double& a, double& b) {
+    double temp = a;
+    a = b;
+    b = temp;
+}
+```
+
+# **Which function does compiler choose?**
+There are many types of function we learned.  
+1. Function overloading
+2. Function template
+3. Function template overloading. (This includes explicit specialization of template.)  
+  
+To choose which function to use, there is a criteria. It is called [overload resolution](https://en.cppreference.com/w/cpp/language/overload_resolution)  
+To summarize,  
+1. Compiler makes list of functions. These functions should have same name as called function.
+2. Then compiler makes list of functions that have same number of parameters. (However, arguments should be able to passed to it via type casting.)
+3. Finds best fitted function.
+    * Parameters of exact match
+    * Parameters that is promoted (ex. short & char -> int or float -> double)
+    * Parameters that goes through standard type casting (ex. int -> char, long -> double)
+    * Parameters that does through user-defined type casting.
+
+> What if there is multiple function with exact match? This should be error, but in special case it is allowed.  
+> For accurate match, compiler makes trivial conversion. 
+> | Argument before trivial conversion | Argument after trivial conversion |
+> | :---: | :---: |
+> | Type | Type& |
+> | Type& | Type |
+> | Type[] | *Type |
+> | Type (argument-list) | Type (*) (argument-list) |
+> | Type | const Type |
+> | Type | volatile Type | 
+> | Type * | const Type * | 
+> | Type * | volatile Type * | 
+
+```cpp
+void temp(Type);        // #1
+void temp(const Type);  // #2
+void temp(Type&);       // #3
+void temp(const Type&); // #4
+
+// If 1 or 2 can be used, compiler returns error.
+// If 3 or 4 can be used, compiler returns no error and performs overload resolution.
+// That is, if argument is Type variable, it calls #3 and if argument is const Type variable, it calls #4.
+```
+
+> If there is multiple perfect match, compiler chooses normal function over explicit specialization of template, and explicit specialization of template over template.  
+> Of course these kind of programming should be avoided if possible.  
+> In some systems correct use of function will give programmer ability to lead compiler to use the function one wants.  
+> This is achieved by combining template prototype and definition. 
+
+```cpp
+#include <iostream>
+
+template <class T>
+T min(T a, T b) {            // #1
+    return a > b ? b : a;
+}
+
+int min(int a, int b) {      // #2
+    a = a < 0 ? -a : a;
+    b = b < 0 ? -b : b;
+    return  a > b ? b : a;
+}
+
+int main () {
+    using namespace std;
+    int m = 20, -30;
+    double x = 15.5, 25.9;
+
+    cout << min(m, n) << endl;       // Uses #2
+    cout << min(x, y) << endl;       // Uses #1 
+    cout << min<>(m, n) << endl;     // Uses #1
+    cout << min<int>(x, y) << endl;  // Uses #2
+    return 0;
+}
+```
+
+The **volatile** keyword in C++ is used to indicate that **a variable's value can be changed by an external agent**, such as a hardware interrupt or signal, a multi-threading process, or any other mechanism outside the control of the program. The compiler is instructed to avoid optimizing the code that accesses such variables.
+
+The use of the volatile keyword is most commonly seen in device driver and low-level system programming where access to memory-mapped I/O devices, memory-mapped memory, or signal flags is required. The volatile keyword ensures that the value of the variable is always read from memory and not cached in a register.
+
+## **decltype** keyword
+```cpp
+template <class T1, class T2>
+void temp(T1 a, T2 b) {
+    ... 
+    ?type? apb = a + b;  // What type should a + b be?
+    ...
+}
+```
+
+To solve problem caused by above code, there is **decltype** in C++. (Added in C++11) You use it like ***decltype (expression) var***.  
+```cpp
+int x;
+decltype(x) y;  // Creates y with same type as x.
+
+// Using this solution is
+template <class T1, class T2>
+void temp(T1 a, T2 b) {
+    ... 
+    decltype(a + b) apb = a + b;  // What type should a + b be?
+    ...
+}
+```
+> 1. If *expression* doesn't have extra paranthesis, *var* just becomes same type as the *expression*.
+> 2. If *expression* is function call (which do have extra parathesis), *var* becomes same type as return type of the function. (Compiler does not excute the function to do this. Compiler only checks function's return type.)
+> 3. If *expression* is lvalue, *var* references *expression*'s type. (First, compiler checks for #1. Thus, look at following example.)
+> ```cpp
+> double x;
+> decltype (x) y = 2.0;   // y is double.  y is lvalue, but without paranthesis, thus compiler uses #1
+> decltype ((x)) z = 1.0; // z is double&. z is lvalue, but with paranthesis, thus compiler uses #3
+> ```
+> 4. If non of #1 ~ #3, *var* becomes same type as *expression*.
+
+**USING typedef WITH decltype IS VERY USEFUL!!!**
+
+### **What if template returns these value?**
+```cpp
+/*
+This is not possible.
+
+template <class T1, class T2>
+decltype (a + b) temp(T1 a, T2 b) {
+    return a + b;
+}
+*/
+
+// This can solve the problem.
+template <class T1, class T2>
+auto temp(T1 a, T2 b) -> decltype (a + b) {
+    return a + b;
+}
+//**-> *dataType*** is called as **trailing return type** since return type is decided after initialization of the parameters. 
+
+// Prototype of above function definition
+auto temp(T1 a, T2 b) -> decltype (a + b);
+```
+> **-> *dataType*** is called as **trailing return type** since return type is decided after initialization of the parameters. 
